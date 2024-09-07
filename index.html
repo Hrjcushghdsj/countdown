@@ -62,7 +62,7 @@
                 const minutes = Math.floor((diff % 3600) / 60);
                 const seconds = diff % 60;
 
-                countdownDiv.innerHTML = `${days} Days\n${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+                countdownDiv.innerHTML = `${days} Days\n${hours} Hours\n${minutes} Minutes\n${seconds} Seconds`;
             }, 1000);
         }
 
