@@ -20,6 +20,7 @@
         }
         #countdown, #form {
             text-align: center;
+            font-size: 
         }
         #makeCountdown {
             margin-top: 0px;
@@ -73,9 +74,9 @@
             const contentDiv = document.getElementById('content');
             contentDiv.innerHTML = `
                 <div id="form">
-                    <label for="datetime">Select Date & Time: </label>
+                    <label for="datetime">Select Date & Time: </label><br>
                     <input type="datetime-local" id="datetime" required><br><br>
-                    <label for="timezone">Select Timezone: </label>
+                    <label for="timezone">Select Timezone: </label><br>
                     <select id="timezone">
                         ${Intl.DateTimeFormat().resolvedOptions().timeZone ? `<option value="${userTimeZone}">${userTimeZone}</option>` : ''}
                         <option value="UTC">UTC</option>
