@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #countdown, #form {
+            text-align: center;
+        }
+        #makeCountdown {
+            margin-top: 10px;
+        }
+        #countdown {
+            width: 80%;
+            margin: 0 auto;
+            font-size: 10vw; /* You can adjust the size of the font if needed */
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <!-- Content will be injected by JavaScript -->
+    </div>
+
+    <script>
+        function pad(n) {
+            return n < 10 ? '0' + n : n;
+        }
+
+        function base36ToUnix(base36) {
+            return parseInt(base36, 36);
+        }
+
+        function unixToBase36(unixTime) {
+            return unixTime.toString(36);
+        }
+
+        function startCountdown(targetUnixTime) {
+            const countdownDiv = document.getElementById('countdown');
+            setInterval(() => {
+                const currentTime = Math.floor(Date.now() / 1000);
+                const diff = targetUnixTime - currentTime;
+
+                if (diff <= 0) {
+                    countdownDiv.innerHTML = "Time is up!";
+                    return;
+                }
+
+                const days = Math.floor(diff / (3600 * 24));
+                const hours = Math.floor((diff % (3600 * 24)) / 3600);
+                const minutes = Math.floor((diff % 3600) / 60);
+                const seconds = diff % 60;
+
+                countdownDiv.innerHTML = `${days} Days\n${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+            }, 1000);
+        }
+
+        function createForm(userTimeZone) {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = `
+                <div id="form">
+                    <label for="datetime">Select Date & Time: </label>
+                    <input type="datetime-local" id="datetime" required><br><br>
+                    <label for="timezone">Select Timezone: </label>
+                    <select id="timezone">
+                        ${Intl.DateTimeFormat().resolvedOptions().timeZone ? `<option value="${userTimeZone}">${userTimeZone}</option>` : ''}
+                        <option value="UTC">UTC</option>
+                        <!-- You can add more time zones if needed -->
+                    </select><br><br>
+                    <button id="makeCountdown" style="display:none;">Make Countdown</button>
+                </div>
+            `;
+
+            const dateTimeInput = document.getElementById('datetime');
+            const makeCountdownButton = document.getElementById('makeCountdown');
+
+            dateTimeInput.addEventListener('change', () => {
+                makeCountdownButton.style.display = 'block';
+            });
+
+            makeCountdownButton.addEventListener('click', () => {
+                const selectedDateTime = new Date(dateTimeInput.value);
+                const timeZone = document.getElementById('timezone').value;
+                const selectedUnixTime = Math.floor(selectedDateTime.getTime() / 1000);
+                const timevalue = unixToBase36(selectedUnixTime);
+
+                // Reload the page with the parameter
+                window.location.href = `?t=${timevalue}`;
+            });
+        }
+
+        // Main logic to check for URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const timeParam = urlParams.get('t');
+
+        if (timeParam) {
+            // If the `t` parameter is present, start the countdown
+            const targetUnixTime = base36ToUnix(timeParam);
+            document.getElementById('content').innerHTML = `<div id="countdown"></div>`;
+            startCountdown(targetUnixTime);
+        } else {
+            // No `t` parameter: create form and detect user's time zone
+            const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            createForm(userTimeZone);
+        }
+    </script>
+</body>
+</html>
